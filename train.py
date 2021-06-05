@@ -160,6 +160,8 @@ if __name__ == '__main__':
         loss_fn = LabelSmoothingLoss(classes=100, smoothing=args.smooth)
     else:
         loss_function = OnlineLabelSmoothing(alpha=args.alpha, n_classes=100, smoothing=args.smooth)
+        if args.gpu:
+            loss_function = loss_function.cuda()
     optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
     train_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=settings.MILESTONES,
                                                      gamma=0.2)  # learning rate decay
