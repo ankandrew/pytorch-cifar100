@@ -125,13 +125,15 @@ if __name__ == '__main__':
     parser.add_argument('-warm', type=int, default=1, help='warm up training phase')
     parser.add_argument('-lr', type=float, default=0.1, help='initial learning rate')
     parser.add_argument('-resume', action='store_true', default=False, help='resume training')
-    # args = parser.parse_args()
+    args = parser.parse_args()
 
-    args = parser.parse_args([
-        '-net', 'resnet18',
-        '-gpu',
-        '-loss', 'ce'
-    ])
+    print(f'{"#"*30}\nCfg: net {args.net}\tloss {args.loss}\t{"#"*30}')
+
+    # args = parser.parse_args([
+    #     '-net', 'resnet18',
+    #     '-gpu',
+    #     '-loss', 'ols'
+    # ])
 
     net = get_network(args)
 
