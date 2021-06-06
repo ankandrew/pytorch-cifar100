@@ -157,7 +157,7 @@ if __name__ == '__main__':
     if args.loss == 'ce':
         loss_function = nn.CrossEntropyLoss()
     elif args.loss == 'ls':
-        loss_fn = LabelSmoothingLoss(classes=100, smoothing=args.smooth)
+        loss_function = LabelSmoothingLoss(classes=100, smoothing=args.smooth)
     else:
         loss_function = OnlineLabelSmoothing(alpha=args.alpha, n_classes=100, smoothing=args.smooth)
         if args.gpu:
