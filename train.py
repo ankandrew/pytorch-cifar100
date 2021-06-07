@@ -66,6 +66,7 @@ def train(epoch):
         attr = attr[1:]
         writer.add_histogram("{}/{}".format(layer, attr), param, epoch)
 
+
     finish = time.time()
 
     print('epoch {} training time consumed: {:.2f}s'.format(epoch, finish - start))
@@ -74,6 +75,7 @@ def train(epoch):
     # becomes from soft -> to hard again.
     if isinstance(loss_function, OnlineLabelSmoothing):
         print(f'Supervise matrix first column: {loss_function.supervise[:,0]}')
+        loss_function.next_epoch()
 
 
 @torch.no_grad()
