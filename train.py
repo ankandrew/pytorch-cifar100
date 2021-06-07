@@ -46,13 +46,14 @@ def train(epoch):
             if 'bias' in name:
                 writer.add_scalar('LastLayerGradients/grad_norm2_bias', para.grad.norm(), n_iter)
 
-        print('Training Epoch: {epoch} [{trained_samples}/{total_samples}]\tLoss: {:0.4f}\tLR: {:0.6f}'.format(
-            loss.item(),
-            optimizer.param_groups[0]['lr'],
-            epoch=epoch,
-            trained_samples=batch_index * args.b + len(images),
-            total_samples=len(cifar100_training_loader.dataset)
-        ))
+        if batch_index % 30 == 0:
+            print('Training Epoch: {epoch} [{trained_samples}/{total_samples}]\tLoss: {:0.4f}\tLR: {:0.6f}'.format(
+                loss.item(),
+                optimizer.param_groups[0]['lr'],
+                epoch=epoch,
+                trained_samples=batch_index * args.b + len(images),
+                total_samples=len(cifar100_training_loader.dataset)
+            ))
 
         # update training loss for each iteration
         writer.add_scalar('Train/loss', loss.item(), n_iter)
@@ -68,6 +69,11 @@ def train(epoch):
     finish = time.time()
 
     print('epoch {} training time consumed: {:.2f}s'.format(epoch, finish - start))
+    # Print ols.supervise matrix first-column
+    # Should double check this distribution, if it
+    # becomes from soft -> to hard again.
+    if isinstance(loss_function, OnlineLabelSmoothing):
+        print(f'Supervise matrix first column: {loss_function.supervise[:,0]}')
 
 
 @torch.no_grad()
@@ -126,14 +132,13 @@ if __name__ == '__main__':
     parser.add_argument('-lr', type=float, default=0.1, help='initial learning rate')
     parser.add_argument('-resume', action='store_true', default=False, help='resume training')
     args = parser.parse_args()
-
-    print(f'{"#"*30}\nCfg: net {args.net}\tloss {args.loss}\t{"#"*30}')
-
     # args = parser.parse_args([
     #     '-net', 'resnet18',
     #     '-gpu',
     #     '-loss', 'ols'
     # ])
+
+    print(f'{"#"*30}\nCfg: net {args.net}\tloss {args.loss}\n{"#"*30}')
 
     net = get_network(args)
 
