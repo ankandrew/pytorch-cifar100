@@ -165,8 +165,11 @@ if __name__ == '__main__':
         loss_function = nn.CrossEntropyLoss()
     elif args.loss == 'ls':
         loss_function = LabelSmoothingLoss(classes=100, smoothing=args.smooth)
+        print(f'{"#" * 10}Label Smoothing{"#" * 10}\nLS w/smoothing={args.smooth}\n{"#" * 30}')
     else:
         loss_function = OnlineLabelSmoothing(alpha=args.alpha, n_classes=100, smoothing=args.smooth)
+        print(
+            f'{"#" * 7}Online Label Smoothing{"#" * 7}\nOLS w/alpha={args.alpha}, smoothing={args.smooth}\n{"#" * 30}')
         if args.gpu:
             loss_function = loss_function.cuda()
     optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
