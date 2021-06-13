@@ -20,9 +20,6 @@ class OnlineLabelSmoothing(nn.Module):
         self.a = alpha
         self.n_classes = n_classes
         # Initialize soft labels with normal LS for first epoch
-        # self.supervise = (1 - smoothing) * torch.eye(n_classes) + smoothing / n_classes
-
-        # With alpha / (n_classes - 1) ----> Alternative
         self.register_buffer('supervise', torch.zeros(n_classes, n_classes))
         self.supervise.fill_(smoothing / (n_classes - 1))
         self.supervise.fill_diagonal_(1 - smoothing)
@@ -50,9 +47,10 @@ class OnlineLabelSmoothing(nn.Module):
         :return: Calculates the soft loss based on current supervise matrix.
         """
         y_h = y_h.log_softmax(dim=-1)
-        with torch.no_grad():
-            self.step(y_h.exp(), y)
-            true_dist = torch.index_select(self.supervise, 1, y).swapaxes(-1, -2)
+        if self.training:
+            with torch.no_grad():
+                self.step(y_h.exp(), y)
+        true_dist = torch.index_select(self.supervise, 1, y).swapaxes(-1, -2)
         return torch.mean(torch.sum(-true_dist * y_h, dim=-1))
 
     def step(self, y_h: Tensor, y: Tensor) -> None:
