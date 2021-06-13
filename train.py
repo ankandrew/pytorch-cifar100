@@ -19,7 +19,7 @@ from conf import settings
 from label_smooth import LabelSmoothingLoss
 from online_label_smoothing import OnlineLabelSmoothing
 from utils import get_network, get_training_dataloader, get_test_dataloader, WarmUpLR, \
-    most_recent_folder, most_recent_weights, last_epoch, best_acc_weights
+    most_recent_folder, most_recent_weights, last_epoch, best_acc_weights, seed_all
 
 
 def train(epoch):
@@ -66,7 +66,6 @@ def train(epoch):
         attr = attr[1:]
         writer.add_histogram("{}/{}".format(layer, attr), param, epoch)
 
-
     finish = time.time()
 
     print('epoch {} training time consumed: {:.2f}s'.format(epoch, finish - start))
@@ -74,7 +73,7 @@ def train(epoch):
     # Should double check this distribution, if it
     # becomes from soft -> to hard again.
     if isinstance(loss_function, OnlineLabelSmoothing):
-        print(f'Supervise matrix first column: {loss_function.supervise[:,0]}')
+        print(f'Supervise matrix first column: {loss_function.supervise[:, 0]}')
         loss_function.next_epoch()
 
 
@@ -133,6 +132,7 @@ if __name__ == '__main__':
     parser.add_argument('-warm', type=int, default=1, help='warm up training phase')
     parser.add_argument('-lr', type=float, default=0.1, help='initial learning rate')
     parser.add_argument('-resume', action='store_true', default=False, help='resume training')
+    parser.add_argument('-seed', type=int, default=1234, help='Seed for reproducibility')
     args = parser.parse_args()
     # args = parser.parse_args([
     #     '-net', 'resnet18',
@@ -140,8 +140,8 @@ if __name__ == '__main__':
     #     '-loss', 'ols'
     # ])
 
-    print(f'{"#"*30}\nCfg: net {args.net}\tloss {args.loss}\n{"#"*30}')
-
+    print(f'{"#" * 30}\nCfg: net {args.net}\tloss {args.loss}\tusing seed {args.seed}\n{"#" * 30}')
+    seed_all(args.seed)
     net = get_network(args)
 
     # data preprocessing:
