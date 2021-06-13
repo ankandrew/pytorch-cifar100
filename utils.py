@@ -12,6 +12,7 @@ import numpy
 import torch
 import torchvision
 import torchvision.transforms as transforms
+from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
 
 
