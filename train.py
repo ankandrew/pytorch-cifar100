@@ -73,7 +73,7 @@ def train(epoch):
     # Should double check this distribution, if it
     # becomes from soft -> to hard again.
     if isinstance(loss_function, OnlineLabelSmoothing):
-        print(f'Supervise matrix first column: {loss_function.supervise[:, 0]}')
+        print(f'Supervise matrix first columns, first 10 rows: {loss_function.supervise[:10, 0]}')
         loss_function.next_epoch()
 
 
@@ -99,9 +99,9 @@ def eval_training(epoch=0, tb=True):
         correct += preds.eq(labels).sum()
 
     finish = time.time()
-    if args.gpu:
-        print('GPU INFO.....')
-        print(torch.cuda.memory_summary(), end='')
+    # if args.gpu:
+    #     print('GPU INFO.....')
+    #     print(torch.cuda.memory_summary(), end='')
     print('Evaluating Network.....')
     print('Test set: Epoch: {}, Average loss: {:.4f}, Accuracy: {:.4f}, Time consumed:{:.2f}s'.format(
         epoch,
@@ -125,7 +125,7 @@ if __name__ == '__main__':
     parser.add_argument('-net', type=str, required=True, help='net type')
     parser.add_argument('-loss', choices=['ce', 'ls', 'ols'], required=True, help='Loss fn to use')
     parser.add_argument('-alpha', type=float, required=False, default=0.5, help='Alpha for ols')
-    parser.add_argument('-smooth', type=float, required=False, default=0.5,
+    parser.add_argument('-smooth', type=float, required=False, default=0.2,
                         help='Initial smoothing for 1st epoch for ols or constant smoothing for ls')
     parser.add_argument('-gpu', action='store_true', default=False, help='use gpu or not')
     parser.add_argument('-b', type=int, default=128, help='batch size for dataloader')
@@ -133,6 +133,7 @@ if __name__ == '__main__':
     parser.add_argument('-lr', type=float, default=0.1, help='initial learning rate')
     parser.add_argument('-resume', action='store_true', default=False, help='resume training')
     parser.add_argument('-seed', type=int, default=1234, help='Seed for reproducibility')
+    parser.add_argument('-workers', type=int, default=2, help='Number of workers for DataLoaders')
     args = parser.parse_args()
     # args = parser.parse_args([
     #     '-net', 'resnet18',
@@ -148,7 +149,7 @@ if __name__ == '__main__':
     cifar100_training_loader = get_training_dataloader(
         settings.CIFAR100_TRAIN_MEAN,
         settings.CIFAR100_TRAIN_STD,
-        num_workers=4,
+        num_workers=args.workers,
         batch_size=args.b,
         shuffle=True
     )
@@ -156,7 +157,7 @@ if __name__ == '__main__':
     cifar100_test_loader = get_test_dataloader(
         settings.CIFAR100_TRAIN_MEAN,
         settings.CIFAR100_TRAIN_STD,
-        num_workers=4,
+        num_workers=args.workers,
         batch_size=args.b,
         shuffle=True
     )
