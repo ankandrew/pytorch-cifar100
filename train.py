@@ -138,12 +138,12 @@ if __name__ == '__main__':
     parser.add_argument('-resume', action='store_true', default=False, help='resume training')
     parser.add_argument('-seed', type=int, default=1234, help='Seed for reproducibility')
     parser.add_argument('-workers', type=int, default=2, help='Number of workers for DataLoaders')
-    # args = parser.parse_args()
-    args = parser.parse_args([
-        '-net', 'resnet18',
-        '-gpu',
-        '-loss', 'ols'
-    ])
+    args = parser.parse_args()
+    # args = parser.parse_args([
+    #     '-net', 'resnet18',
+    #     '-gpu',
+    #     '-loss', 'ols'
+    # ])
 
     print(f'{"#" * 30}\nCfg: net {args.net}\tloss {args.loss}\tusing seed {args.seed}\n{"#" * 30}')
     seed_all(args.seed)
