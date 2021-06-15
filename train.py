@@ -25,6 +25,8 @@ from utils import get_network, get_training_dataloader, get_test_dataloader, War
 def train(epoch):
     start = time.time()
     net.train()
+    if isinstance(loss_function, OnlineLabelSmoothing):
+        loss_function.train()
     for batch_index, (images, labels) in enumerate(cifar100_training_loader):
 
         if args.gpu:
@@ -79,6 +81,8 @@ def train(epoch):
 
 @torch.no_grad()
 def eval_training(epoch=0, tb=True):
+    if isinstance(loss_function, OnlineLabelSmoothing):
+        loss_function.eval()
     start = time.time()
     net.eval()
 
@@ -134,12 +138,12 @@ if __name__ == '__main__':
     parser.add_argument('-resume', action='store_true', default=False, help='resume training')
     parser.add_argument('-seed', type=int, default=1234, help='Seed for reproducibility')
     parser.add_argument('-workers', type=int, default=2, help='Number of workers for DataLoaders')
-    args = parser.parse_args()
-    # args = parser.parse_args([
-    #     '-net', 'resnet18',
-    #     '-gpu',
-    #     '-loss', 'ols'
-    # ])
+    # args = parser.parse_args()
+    args = parser.parse_args([
+        '-net', 'resnet18',
+        '-gpu',
+        '-loss', 'ols'
+    ])
 
     print(f'{"#" * 30}\nCfg: net {args.net}\tloss {args.loss}\tusing seed {args.seed}\n{"#" * 30}')
     seed_all(args.seed)
